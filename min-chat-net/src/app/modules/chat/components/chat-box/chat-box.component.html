@@ -1,0 +1,12 @@
+<div class="chat-box">
+    <div class="chat-box__view">
+        <app-user-message *ngFor="let message of chatContent" [message]="message"></app-user-message>
+    </div>
+    <div class="chat-box__input">
+        <div nz-row>
+            <div nz-col nzSpan="24">
+                <app-message-input [disabled]="!connected" (send)="onSendMessage($event)"></app-message-input>
+            </div>
+        </div>
+    </div>
+</div>

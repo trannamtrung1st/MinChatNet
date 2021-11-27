@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinChatNet", "MinChatNet\MinChatNet.csproj", "{35EA7204-CE3C-471F-80A6-A3D98732802E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinChatNet.ChatApi", "MinChatNet.ChatApi\MinChatNet.ChatApi.csproj", "{A27A9939-756A-4558-B35D-DA7067165A6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{35EA7204-CE3C-471F-80A6-A3D98732802E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35EA7204-CE3C-471F-80A6-A3D98732802E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35EA7204-CE3C-471F-80A6-A3D98732802E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A27A9939-756A-4558-B35D-DA7067165A6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A27A9939-756A-4558-B35D-DA7067165A6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A27A9939-756A-4558-B35D-DA7067165A6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A27A9939-756A-4558-B35D-DA7067165A6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

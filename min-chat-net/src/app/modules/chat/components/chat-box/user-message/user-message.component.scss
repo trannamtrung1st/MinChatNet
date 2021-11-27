@@ -1,0 +1,57 @@
+@import "variables";
+
+%shared-message__body {
+    padding: $small-space $common-space;
+    border-radius: $common-border-radius;
+    display: inline-block;
+}
+
+.message {
+    &__body-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &--mine &__body-container {
+        text-align: right;
+    }
+
+    &__display-name {
+        font-size: $font-size-small;
+        color: $color-light-gray;
+        padding: 0 $small-space;
+    }
+
+    &--mine &__body {
+        @extend %shared-message__body;
+        background-color: $color-primary-darker;
+        color: $color-white;
+    }
+
+    &--other &__body {
+        @extend %shared-message__body;
+        background-color: $color-white;
+    }
+
+    .avatar-placeholder {
+        $avatar-size: 40px;
+
+        width: $avatar-size;
+        height: $avatar-size;
+    }
+}
+
+:host {
+    ::ng-deep {
+        .message {
+            nz-card {
+                background-color: transparent;
+                border: none;
+                .ant-card-body {
+                    background-color: transparent;
+                    padding: 0;
+                }
+            }
+        }
+    }
+}

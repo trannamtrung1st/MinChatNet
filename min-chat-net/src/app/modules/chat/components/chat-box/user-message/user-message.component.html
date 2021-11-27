@@ -1,0 +1,31 @@
+<div class="message" [ngClass]="classObject">
+    <div nz-row nzAlign="middle" nzGutter="8" [nzJustify]="message.isMine ? 'end' : 'start'">
+        <div nz-col nzFlex *ngIf="!message.isMine">
+            <ng-container *ngTemplateOutlet="avatar; context: { message: message }"></ng-container>
+        </div>
+        <div nz-col nzSpan="16" class="message__body-container">
+            <span class="message__display-name" *ngIf="!message.isSameUser">
+                {{message.fromUser.displayName}}
+            </span>
+            <nz-card>
+                <div class="message__body line-wrap">
+                    <span>{{message.content}}</span>
+                </div>
+            </nz-card>
+        </div>
+        <div nz-col nzFlex *ngIf="message.isMine">
+            <ng-container *ngTemplateOutlet="avatar; context: { message: message }"></ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-template #avatar let-message="message">
+    <ng-container *ngIf="!message.isSameUser; else avatarPlaceholder">
+        <nz-avatar nzSize="large" nzIcon="user" [nzSrc]="message.fromUser.avatar">
+        </nz-avatar>
+    </ng-container>
+    <ng-template #avatarPlaceholder>
+        <div class="avatar-placeholder">
+        </div>
+    </ng-template>
+</ng-template>

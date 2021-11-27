@@ -1,0 +1,22 @@
+<div class="message-input">
+    <div nz-row nzGutter="16" nzJustify="space-around">
+        <div nz-col nzFlex="97">
+            <textarea (keypress)="onMessageKeyPress($event)" nz-input placeholder="Type something"
+                [formControl]="messageControl" [nzAutosize]="{ maxRows: 3 }"></textarea>
+        </div>
+        <div nz-col nzFlex="3">
+            <ng-container *ngIf="!disabled; else btnLoading">
+                <button [disabled]="messageControl.invalid || messageControl.disabled" (click)="onSend()"
+                    class="message-input__btn-send" nz-button nzType="primary" nzSize="large" nzShape="circle">
+                    <i nz-icon nzType="send" nzTheme="outline"></i>
+                </button>
+            </ng-container>
+            <ng-template #btnLoading>
+                <button disabled class="message-input__btn-loading" nz-button nzType="primary" nzSize="large"
+                    nzShape="circle">
+                    <i nz-icon nzType="loading" nzTheme="outline"></i>
+                </button>
+            </ng-template>
+        </div>
+    </div>
+</div>

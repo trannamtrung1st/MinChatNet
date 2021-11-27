@@ -1,0 +1,20 @@
+@import "variables";
+
+.message-input {
+    padding: $common-space;
+}
+
+:host {
+    ::ng-deep {
+        .message-input {
+            textarea {
+                $adjusted-top: 7px;
+
+                padding-top: $adjusted-top;
+                border-radius: $common-border-radius;
+                min-height: $large-size;
+                resize: none;
+            }
+        }
+    }
+}
