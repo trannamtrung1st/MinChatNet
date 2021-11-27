@@ -1,12 +1,23 @@
 <div class="message-input">
-    <div nz-row nzGutter="16" nzJustify="space-around">
-        <div nz-col nzFlex="97">
-            <textarea (keypress)="onMessageKeyPress($event)" nz-input placeholder="Type something"
-                [formControl]="messageControl" [nzAutosize]="{ maxRows: 3 }"></textarea>
+    <div nz-row nzGutter="16" nzJustify="space-around" nzAlign="middle">
+        <div nz-col nzFlex="98">
+            <textarea #messageElement (keypress)="onMessageKeyPress($event)" nz-input autofocus
+                placeholder="Type something" [formControl]="messageControl" [nzAutosize]="{ maxRows: 3 }"></textarea>
         </div>
-        <div nz-col nzFlex="3">
+        <div nz-col nzFlex="1">
+            <ng-template #emojiPopover>
+                <emoji-mart (emojiClick)="onAddEmoji($event)" title="Pick your emoji…" emoji="point_up"></emoji-mart>
+            </ng-template>
+            <button [disabled]="disabled" class="message-input__btn-emoji" nz-button nzType="text" nzSize="large"
+                nzShape="circle" nz-popover nzPopoverPlacement="topLeft" nzPopoverTrigger="click"
+                (nzPopoverVisibleChange)="onChangePopoverVisible($event)" [nzPopoverContent]="emojiPopover"
+                [(nzPopoverVisible)]="emojiVisible">
+                <i nz-icon nzType="heart" nzTheme="fill"></i>
+            </button>
+        </div>
+        <div nz-col nzFlex="1">
             <ng-container *ngIf="!disabled; else btnLoading">
-                <button [disabled]="messageControl.invalid || messageControl.disabled" (click)="onSend()"
+                <button [disabled]="messageControl.invalid || disabled" (click)="onSend()"
                     class="message-input__btn-send" nz-button nzType="primary" nzSize="large" nzShape="circle">
                     <i nz-icon nzType="send" nzTheme="outline"></i>
                 </button>

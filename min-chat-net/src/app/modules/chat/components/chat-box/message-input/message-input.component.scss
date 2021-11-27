@@ -2,6 +2,13 @@
 
 .message-input {
     padding: $common-space;
+
+    &__btn-emoji {
+        i {
+            font-size: larger;
+            color: $color-red;
+        }
+    }
 }
 
 :host {
