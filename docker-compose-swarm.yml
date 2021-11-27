@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  chat-api:
+    image: trannamtrung1st/min-chat-net:chat-api-1.0
+    ports:
+      - target: 80
+        published: 8080
+
+  chat-client:
+    image: trannamtrung1st/min-chat-net:chat-client-1.0
+    ports:
+      - target: 80
+        published: 7070
+    
+networks:
+  default:
+    name: min-chat-net-network

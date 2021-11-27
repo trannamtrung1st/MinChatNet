@@ -1,0 +1,33 @@
+﻿docker container rm -f chat-api-1.0
+
+docker image prune -f
+docker image rm -f trannamtrung1st/min-chat-net:chat-api-1.0
+docker image build . -t trannamtrung1st/min-chat-net:chat-api-1.0 -f MinChatNet.ChatApi/Dockerfile
+docker image push trannamtrung1st/min-chat-net:chat-api-1.0
+
+docker container run -d --name chat-api-1.0 -p 8080:80 trannamtrung1st/min-chat-net:chat-api-1.0
+
+
+# ================ References =================
+#docker container ls
+#docker ps
+#docker exec -it {container-name-or-id} /bin/bash
+#docker container stop {container-name-or-id}
+#docker container start {container-name-or-id}
+#docker container rm -f {container-name-or-id}
+#docker container run -it # interactive and terminal
+#docker container run -d #daemon, detached
+#docker container run -it --name ubuntu-dev ubuntu sh
+#docker image ls
+#docker image rm [image-id-or-{docker-hub-id/repository:tag}]
+#docker rmi 
+
+# ================ Docker shortcuts =================
+# Ctrl + P + Q: back to terminal and leave shell running
+
+
+# ================ Docker services =================
+docker service rm chat-api-1_0
+docker service create --name chat-api-1_0 --publish 8080:80 --replicas 3 trannamtrung1st/min-chat-net:chat-api-1.0
+docker service ls
+docker service ps chat-api-1_0

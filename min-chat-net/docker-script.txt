@@ -1,0 +1,15 @@
+﻿docker container rm -f chat-client-1.0
+
+docker image prune -f
+docker image rm -f trannamtrung1st/min-chat-net:chat-client-1.0
+docker image build . -t trannamtrung1st/min-chat-net:chat-client-1.0
+docker image push trannamtrung1st/min-chat-net:chat-client-1.0
+
+docker container run -d --name chat-client-1.0 -p 7070:80 trannamtrung1st/min-chat-net:chat-client-1.0
+
+
+# ================ Docker services =================
+docker service rm chat-client-1_0
+docker service create --name chat-client-1_0 --publish 7070:80 --replicas 3 trannamtrung1st/min-chat-net:chat-client-1.0
+docker service ls
+docker service ps chat-client-1_0

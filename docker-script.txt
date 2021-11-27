@@ -1,0 +1,28 @@
+#docker network create -d overlay --attachable min-chat-net-network
+#docker network create -d overlay --ingress min-chat-net-ingress-network
+#docker network inspect min-chat-net-ingress-network
+
+
+docker-compose up -d
+docker-compose down
+
+
+#docker-compose up -f {path}
+
+
+# ================ Services/Stack =================
+docker swarm init
+docker stack deploy -c docker-compose-swarm.yml min-chat-net
+docker stack ls
+docker stack services min-chat-net
+docker stack ps min-chat-net
+#docker stack rm min-chat-net
+
+
+# ================ References =================
+#docker swarm init --advertise-addr=...
+#docker swarm join-token manager
+#docker swarm join-token worker
+#docker node ls
+#docker service scale {app}=4
+#docker network ls

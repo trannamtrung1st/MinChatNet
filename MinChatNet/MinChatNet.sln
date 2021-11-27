@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinChatNet", "MinChatNet\MinChatNet.csproj", "{35EA7204-CE3C-471F-80A6-A3D98732802E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinChatNet", "MinChatNet\MinChatNet.csproj", "{35EA7204-CE3C-471F-80A6-A3D98732802E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinChatNet.ChatApi", "MinChatNet.ChatApi\MinChatNet.ChatApi.csproj", "{A27A9939-756A-4558-B35D-DA7067165A6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinChatNet.ChatApi", "MinChatNet.ChatApi\MinChatNet.ChatApi.csproj", "{A27A9939-756A-4558-B35D-DA7067165A6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
