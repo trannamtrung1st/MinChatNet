@@ -1,0 +1,26 @@
+@import "variables";
+
+.layout {
+    height: 100vh;
+
+    nz-header {
+        position: fixed;
+        background-color: $color-white;
+        width: 100%;
+        z-index: $layout-z-index;
+
+        .user-menu {
+            &__avatar {
+                display: flex;
+                align-items: center;
+                nz-avatar {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    nz-content {
+        margin-top: $layout-header-height;
+    }
+}

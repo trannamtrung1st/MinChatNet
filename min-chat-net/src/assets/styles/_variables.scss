@@ -6,6 +6,7 @@ $color-red: red;
 
 $common-space: 16px;
 $small-space: $common-space / 2;
+$smaller-space: $common-space / 4;
 $large-space: $common-space * 2;
 
 $common-border-radius: 16px;
@@ -13,3 +14,6 @@ $common-border-radius: 16px;
 $large-size: 40px;
 
 $font-size-small: 10px;
+
+$layout-header-height: 48px;
+$layout-z-index: 100;

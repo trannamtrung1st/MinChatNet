@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { MessageModel } from '@modules/chat/models/message.model';
+import { MessageViewModel } from '@modules/chat/view-models/message-view.model';
 
 @Component({
   selector: 'app-user-message',
@@ -9,7 +9,7 @@ import { MessageModel } from '@modules/chat/models/message.model';
 })
 export class UserMessageComponent implements OnInit {
 
-  @Input() message!: MessageModel;
+  @Input() message!: MessageViewModel;
 
   classObject: { [key: string]: any };
 

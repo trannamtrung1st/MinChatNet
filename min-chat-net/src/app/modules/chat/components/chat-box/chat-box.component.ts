@@ -2,12 +2,11 @@ import { Component, Input, OnInit } from '@angular/core';
 
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
-import { randomUser } from '@modules/chat/helpers/user.helper';
-
 import { environment } from '@environments/environment';
 
 import { MessageModel } from '@modules/chat/models/message.model';
-import { UserModel } from '@modules/user/models/user.model';
+import { UserModel } from '@modules/identity/models/user.model';
+import { MessageViewModel } from '@modules/chat/view-models/message-view.model';
 
 
 @Component({
@@ -21,7 +20,7 @@ export class ChatBoxComponent implements OnInit {
 
   hubConnection!: HubConnection;
   connected: boolean;
-  chatContent: MessageModel[];
+  chatContent: MessageViewModel[];
 
   constructor() {
     this.connected = false;
@@ -37,25 +36,29 @@ export class ChatBoxComponent implements OnInit {
   }
 
   private _sendMessage(content: string) {
-    this.hubConnection.invoke('SendMessage', this.currentUser.displayName, content).catch((err) => console.error(err));
+    const messageModel: MessageModel = {
+      content,
+      fromUser: this.currentUser
+    }
+    this.hubConnection.invoke('SendMessage', messageModel).catch((err) => console.error(err));
   }
 
-  private _receiveMessage(displayName: string, content: string) {
-    const isMine = this.currentUser.displayName === displayName;
-    this.chatContent.unshift({
-      content,
-      fromUser: isMine ? this.currentUser : randomUser(displayName),
-      isMine,
-      isSameUser: this.chatContent.length ? this.chatContent[0].fromUser.displayName === displayName : false
-    });
+  private _receiveMessage(messageModel: MessageModel) {
+    const isSameUser = this.chatContent.length ? this.chatContent[0].fromUser.userId === messageModel.fromUser.userId : false;
+    const messageViewModel: MessageViewModel = {
+      ...messageModel,
+      isMine: messageModel.fromUser.userId === this.currentUser.userId,
+      isSameUser: isSameUser
+    }
+    this.chatContent.unshift(messageViewModel);
   }
 
   private _connectHub() {
     const hubUrl = new URL("/hub/chat", environment.apiUrl);
     this.hubConnection = new HubConnectionBuilder().withUrl(hubUrl.toString()).build();
 
-    this.hubConnection.on("receiveMessage", (displayName: string, content: string) =>
-      this._receiveMessage(displayName, content));
+    this.hubConnection.on("ReceiveMessage", (messageModel: MessageModel) =>
+      this._receiveMessage(messageModel));
 
     this.hubConnection.start()
       .then(() => {

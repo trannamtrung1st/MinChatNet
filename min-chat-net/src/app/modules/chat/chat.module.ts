@@ -13,12 +13,14 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 
 import { ChatRoutingModule } from './chat-routing.module';
+import { CoreModule } from '@modules/core/core.module';
+
+import { EMOJI_MAP } from './chat.constant';
 
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { PublicChatComponent } from './pages/public-chat/public-chat.component';
 import { MessageInputComponent } from './components/chat-box/message-input/message-input.component';
 import { UserMessageComponent } from './components/chat-box/user-message/user-message.component';
-import { EMOJI_MAP } from './chat.constant';
 
 
 @NgModule({
@@ -40,7 +42,8 @@ import { EMOJI_MAP } from './chat.constant';
     NzGridModule,
     NzAvatarModule,
     NzPopoverModule,
-    ChatRoutingModule
+    ChatRoutingModule,
+    CoreModule
   ]
 })
 export class ChatModule {

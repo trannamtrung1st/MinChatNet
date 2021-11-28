@@ -1,0 +1,22 @@
+@import "variables";
+
+.login {
+    &__row {
+        height: 100vh;
+    }
+    &__title {
+        background-color: $color-primary;
+        padding: $common-space;
+        text-align: center;
+        h1 {
+            color: $color-white;
+            margin: 0;
+        }
+    }
+    &__container {
+        text-align: center;
+        #firebaseui-auth-container {
+            display: inline-block;
+        }
+    }
+}

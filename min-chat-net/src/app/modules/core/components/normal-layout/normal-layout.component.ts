@@ -5,20 +5,22 @@ import { Subscription } from 'rxjs';
 import { UserModel } from '@modules/identity/models/user.model';
 
 import { GlobalStateService } from '@modules/core/services/global-state.service';
+import { AuthService } from '@modules/core/services/auth.service';
 
 
 @Component({
-  selector: 'app-public-chat',
-  templateUrl: './public-chat.component.html',
-  styleUrls: ['./public-chat.component.scss']
+  selector: 'app-normal-layout',
+  templateUrl: './normal-layout.component.html',
+  styleUrls: ['./normal-layout.component.scss']
 })
-export class PublicChatComponent implements OnInit, OnDestroy {
+export class NormalLayoutComponent implements OnInit, OnDestroy {
 
   currentUser?: UserModel;
 
   private readonly _subscriptions: Subscription[];
 
-  constructor(private _globalStateService: GlobalStateService) {
+  constructor(private _globalStateService: GlobalStateService,
+    private _authService: AuthService) {
     this._subscriptions = [];
   }
 
@@ -32,4 +34,7 @@ export class PublicChatComponent implements OnInit, OnDestroy {
     );
   }
 
+  onLogout() {
+    this._authService.logout();
+  }
 }

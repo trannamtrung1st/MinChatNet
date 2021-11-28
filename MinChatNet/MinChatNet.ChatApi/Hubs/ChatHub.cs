@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using MinChatNet.ChatApi.Clients;
+using MinChatNet.ChatApi.Models;
 
 namespace MinChatNet.ChatApi.Hubs
 {
-    public class ChatHub : Hub
+    public class ChatHub : Hub<IChatClient>
     {
-        public async Task SendMessage(string displayName, string messageContent)
+        public async Task SendMessage(MessageModel messageModel)
         {
-            await Clients.All.SendAsync("receiveMessage", displayName, messageContent);
+            await Clients.All.ReceiveMessage(messageModel);
         }
     }
 }
