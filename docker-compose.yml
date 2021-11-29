@@ -11,7 +11,15 @@ services:
     ports:
       - target: 80
         published: 7070
-    
+
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 123456
+
 networks:
   default:
     name: min-chat-net-network
