@@ -25,11 +25,11 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     this._authUi?.delete();
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this._authService.getFirebaseAuth()
-      .then(auth => {
+      .then(async auth => {
         if (auth.currentUser) {
-          this._authService.loginFromFirebase(auth.currentUser);
+          await this._authService.loginFromFirebase(auth.currentUser);
         } else {
           this.classObject['login--hidden'] = false;
           this._startSignInFlow(auth);

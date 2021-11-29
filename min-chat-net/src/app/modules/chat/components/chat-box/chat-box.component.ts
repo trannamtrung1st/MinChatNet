@@ -55,7 +55,9 @@ export class ChatBoxComponent implements OnInit {
 
   private _connectHub() {
     const hubUrl = new URL("/hub/chat", environment.apiUrl);
-    this.hubConnection = new HubConnectionBuilder().withUrl(hubUrl.toString()).build();
+    this.hubConnection = new HubConnectionBuilder()
+      .withUrl(hubUrl.toString(), { accessTokenFactory: () => sessionStorage.getItem('accessToken') as string })
+      .build();
 
     this.hubConnection.on("ReceiveMessage", (messageModel: MessageModel) =>
       this._receiveMessage(messageModel));
