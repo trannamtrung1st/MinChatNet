@@ -21,15 +21,15 @@ export class AuthService {
     private _router: Router,
     private _httpClient: HttpClient) { }
 
-  async loginFromFirebase(fbUser: firebaseAuth.User) {
+  async loginFromFirebase() {
     const auth = await this.getFirebaseAuth();
     auth.currentUser?.getIdToken(true).then((idToken: string) => {
       const url = new URL('/api/auth/token', environment.apiUrl);
       this._httpClient.post<TokenResponseModel>(url.toString(), { idToken })
         .subscribe((tokenResponse) => {
           sessionStorage.setItem('accessToken', tokenResponse.accessToken);
-          const user = this._getUserFromFirebase(fbUser);
-          this.login(user);
+          sessionStorage.setItem('localUser', JSON.stringify(tokenResponse.user));
+          this.login(tokenResponse.user);
         });
     }).catch((error) => {
       console.error(error);
@@ -44,20 +44,10 @@ export class AuthService {
   async logout(): Promise<void> {
     this._globalStateService.setCurrentUser(undefined);
     sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('localUser');
     const auth = await this.getFirebaseAuth();
     await auth.signOut();
     this._router.navigateByUrl('/identity/login');
-  }
-
-  async getCurrentUser(): Promise<UserModel | undefined> {
-    if (this._globalStateService.currentUser) return this._globalStateService.currentUser;
-    const auth = await this.getFirebaseAuth();
-    if (auth.currentUser) {
-      const user = this._getUserFromFirebase(auth.currentUser);
-      this._globalStateService.setCurrentUser(user);
-      return user;
-    }
-    return undefined;
   }
 
   async getFirebaseAuth(): Promise<firebaseAuth.Auth> {

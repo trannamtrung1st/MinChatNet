@@ -11,6 +11,10 @@
         padding: $common-space;
     }
 
+    .nothing-more {
+        color: $color-light-gray;
+    }
+
     app-user-message:not(:first-child) {
         margin-bottom: $smaller-space;
     }

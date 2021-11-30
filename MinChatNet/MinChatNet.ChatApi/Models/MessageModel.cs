@@ -4,5 +4,6 @@
     {
         public string Content { get; set; }
         public UserModel FromUser { get; set; }
+        public DateTimeOffset Time { get; set; }
     }
 }

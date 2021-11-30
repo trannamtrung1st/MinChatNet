@@ -22,4 +22,11 @@ export class GlobalStateService {
         this._currentUser = user;
         this._currentUser$.next(user);
     }
+
+    loadLocalUser() {
+        const userStr = sessionStorage.getItem('localUser');
+        if (userStr) {
+            this.setCurrentUser(JSON.parse(userStr));
+        }
+    }
 }

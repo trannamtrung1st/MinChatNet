@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import * as firebase from "firebase/app";
 
+import { GlobalStateService } from '@modules/core/services/global-state.service';
+
 
 @Component({
   selector: 'app-root',
@@ -10,7 +12,7 @@ import * as firebase from "firebase/app";
 })
 export class AppComponent implements OnInit {
 
-  constructor() { }
+  constructor(private _globalStateService: GlobalStateService) { }
 
   async ngOnInit() {
     const firebaseConfig: firebase.FirebaseOptions = {
@@ -23,5 +25,7 @@ export class AppComponent implements OnInit {
     };
 
     const app = firebase.initializeApp(firebaseConfig);
+
+    this._globalStateService.loadLocalUser();
   }
 }

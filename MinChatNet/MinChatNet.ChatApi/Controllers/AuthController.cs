@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MinChatNet.ChatApi.Models;
 using MinChatNet.ChatApi.Persistence;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -46,6 +47,12 @@ namespace MinChatNet.ChatApi.Controllers
 
             return Ok(new TokenResponse
             {
+                User = new UserModel
+                {
+                    Avatar = userEntity.Avatar,
+                    UserId = userEntity.Id,
+                    DisplayName = userEntity.DisplayName
+                },
                 AccessToken = accessToken
             });
         }
@@ -89,6 +96,7 @@ namespace MinChatNet.ChatApi.Controllers
 
     public class TokenResponse
     {
+        public UserModel User { get; set; }
         public string AccessToken { get; set; }
     }
 

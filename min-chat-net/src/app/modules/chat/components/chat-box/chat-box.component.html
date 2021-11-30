@@ -1,6 +1,13 @@
 <div class="chat-box">
-    <div class="chat-box__view">
+    <div class="chat-box__view" #chatView (scroll)="onScroll($event)">
         <app-user-message *ngFor="let message of chatContent" [message]="message"></app-user-message>
+        <div class="nothing-more" *ngIf="oldest">
+            <div nz-row nzJustify="center">
+                <div nz-col nzFlex>
+                    Nothing more to read
+                </div>
+            </div>
+        </div>
     </div>
     <div class="chat-box__input">
         <div nz-row>

@@ -29,7 +29,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     this._authService.getFirebaseAuth()
       .then(async auth => {
         if (auth.currentUser) {
-          await this._authService.loginFromFirebase(auth.currentUser);
+          await this._authService.loginFromFirebase();
         } else {
           this.classObject['login--hidden'] = false;
           this._startSignInFlow(auth);
@@ -42,8 +42,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     const uiConfig: firebaseui.auth.Config = {
       callbacks: {
         signInSuccessWithAuthResult: (authResult, redirectUrl: string) => {
-          const fbUser: firebaseAuth.User = authResult.user;
-          this._authService.loginFromFirebase(fbUser);
+          this._authService.loginFromFirebase();
           return false;
         },
         uiShown: () => {

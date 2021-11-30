@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 
 import { AuthService } from './auth.service';
+import { GlobalStateService } from './global-state.service';
 
 
 @Injectable({
@@ -10,10 +11,11 @@ import { AuthService } from './auth.service';
 export class AuthGuardService implements CanActivate {
 
     constructor(private _router: Router,
-        private _authService: AuthService) { }
+        private _authService: AuthService,
+        private _globalStateService: GlobalStateService) { }
 
     async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
-        const user = await this._authService.getCurrentUser();
+        const user = await this._globalStateService.currentUser;
         if (!user) {
             return this._router.parseUrl('/identity/login');
         }
