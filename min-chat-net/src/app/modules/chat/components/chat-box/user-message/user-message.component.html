@@ -8,7 +8,8 @@
                 {{message.fromUser.displayName}}
             </span>
             <nz-card>
-                <div class="message__body line-wrap">
+                <div class="message__body line-wrap" [nzTooltipTitle]="message.time | date: TIME_FORMAT"
+                    [nzTooltipMouseEnterDelay]="1.5" nzTooltipPlacement="top" nz-tooltip>
                     <span>{{message.content}}</span>
                 </div>
             </nz-card>

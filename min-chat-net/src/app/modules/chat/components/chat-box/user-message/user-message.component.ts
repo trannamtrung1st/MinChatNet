@@ -11,6 +11,8 @@ export class UserMessageComponent implements OnInit {
 
   @Input() message!: MessageViewModel;
 
+  readonly TIME_FORMAT = 'dd/MM/yyyy HH:mm:ss aa';
+
   classObject: { [key: string]: any };
 
   constructor() {

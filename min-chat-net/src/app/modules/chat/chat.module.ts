@@ -10,6 +10,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 
 import { ChatRoutingModule } from './chat-routing.module';
@@ -41,6 +42,7 @@ import { UserMessageComponent } from './components/chat-box/user-message/user-me
     NzCardModule,
     NzGridModule,
     NzAvatarModule,
+    NzToolTipModule,
     NzPopoverModule,
     ChatRoutingModule,
     CoreModule
