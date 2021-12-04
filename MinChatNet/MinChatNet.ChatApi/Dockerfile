@@ -17,6 +17,8 @@ FROM build AS publish
 RUN dotnet publish "MinChatNet.ChatApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
+WORKDIR /
+COPY MinChatNet.ChatApi/startup.sh .
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "MinChatNet.ChatApi.dll"]
+ENTRYPOINT ["/bin/sh", "/startup.sh", "60", "dotnet ./MinChatNet.ChatApi.dll"]

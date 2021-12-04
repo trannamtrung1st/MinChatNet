@@ -5,6 +5,9 @@ services:
     ports:
       - target: 80
         published: 8080
+    depends_on:
+      - postgres
+      - cass1
 
   chat-client:
     image: trannamtrung1st/min-chat-net:chat-client-1.0
@@ -24,6 +27,7 @@ services:
     image: trannamtrung1st/min-chat-net:mcn-cass-1.0
     ports:
       - 9042:9042
+    restart: always
 
 networks:
   default:
