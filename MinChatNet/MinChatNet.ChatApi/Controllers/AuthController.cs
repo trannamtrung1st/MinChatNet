@@ -43,22 +43,41 @@ namespace MinChatNet.ChatApi.Controllers
             userEntity.DisplayName = decodedToken.Claims["name"] as string;
             await _dataContext.SaveChangesAsync();
 
-            var accessToken = GenerateTokenResponse(userEntity);
+            var userModel = new UserModel
+            {
+                Avatar = userEntity.Avatar,
+                DisplayName = userEntity.DisplayName,
+                IsGuest = false,
+                UserId = userEntity.Id
+            };
+            var accessToken = GenerateTokenResponse(userModel);
 
             return Ok(new TokenResponse
             {
-                User = new UserModel
-                {
-                    Avatar = userEntity.Avatar,
-                    UserId = userEntity.Id,
-                    DisplayName = userEntity.DisplayName
-                },
+                User = userModel,
                 AccessToken = accessToken
             });
         }
 
+        [HttpPost("guest/token")]
+        public async Task<IActionResult> ExchangeGuestTokenAsync([FromBody] ExchangeGuestTokenModel model)
+        {
+            var userModel = new UserModel
+            {
+                DisplayName = model.DisplayName,
+                IsGuest = true,
+                UserId = Guid.NewGuid().ToString()
+            };
+            var accessToken = GenerateTokenResponse(userModel);
 
-        private string GenerateTokenResponse(UserEntity userEntity)
+            return Ok(new TokenResponse
+            {
+                User = userModel,
+                AccessToken = accessToken
+            });
+        }
+
+        private string GenerateTokenResponse(UserModel userModel)
         {
             #region Generate JWT Token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -69,7 +88,9 @@ namespace MinChatNet.ChatApi.Controllers
             var identity = new ClaimsIdentity(JwtBearerDefaults.AuthenticationScheme);
 
             identity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, userEntity.Id));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, userModel.UserId));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.GivenName, userModel.DisplayName));
+            identity.AddClaim(new Claim(ClaimTypes.Anonymous, $"{userModel.IsGuest}"));
             identity.AddClaims(audClaims);
 
             var utcNow = DateTime.UtcNow;
@@ -103,5 +124,10 @@ namespace MinChatNet.ChatApi.Controllers
     public class ExchangeTokenModel
     {
         public string IdToken { get; set; }
+    }
+
+    public class ExchangeGuestTokenModel
+    {
+        public string DisplayName { get; set; }
     }
 }

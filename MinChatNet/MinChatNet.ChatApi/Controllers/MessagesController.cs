@@ -1,4 +1,5 @@
 ﻿using Cassandra.Data.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinChatNet.ChatApi.Models;
@@ -9,6 +10,7 @@ namespace MinChatNet.ChatApi.Controllers
 {
     [Route("api/messages")]
     [ApiController]
+    [Authorize]
     public class MessageController : ControllerBase
     {
         private readonly DataContext _dataContext;
@@ -41,6 +43,7 @@ namespace MinChatNet.ChatApi.Controllers
                 {
                     Avatar = o.Avatar,
                     DisplayName = o.DisplayName,
+                    IsGuest = false,
                     UserId = o.Id
                 }).ToDictionaryAsync(o => o.UserId);
 
@@ -50,7 +53,13 @@ namespace MinChatNet.ChatApi.Controllers
             {
                 Content = o.Content,
                 Time = o.Time,
-                FromUser = users.TryGetValue(o.UserId, out var fromUser) ? fromUser : null
+                UserDisplayName = o.UserDisplayName,
+                FromUser = users.TryGetValue(o.UserId, out var fromUser) ? fromUser : new UserModel
+                {
+                    DisplayName = o.UserDisplayName,
+                    UserId = o.UserId,
+                    IsGuest = true,
+                }
             }).ToArray();
 
             var messageHistoryModel = new MessageHistoryResponseModel
@@ -61,50 +70,5 @@ namespace MinChatNet.ChatApi.Controllers
 
             return Ok(messageHistoryModel);
         }
-
-        private async Task InitMockMessages()
-        {
-            if (Init) return;
-
-            Init = true;
-            var random = new Random();
-
-            var users = await _dataContext.Users.Select(o => new UserModel
-            {
-                Avatar = o.Avatar,
-                DisplayName = o.DisplayName,
-                UserId = o.Id
-            }).ToArrayAsync();
-
-            foreach (var message in MockMessages)
-            {
-                message.FromUser = users[random.Next(users.Length)];
-            }
-        }
-
-        static MessageController()
-        {
-            var random = new Random();
-            MockMessages = Enumerable.Range(0, random.Next(50, 100))
-                .Select(i => new MessageModel
-                {
-                    Content = MockContents[random.Next(MockContents.Length)],
-                    Time = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(i)),
-                }).ToArray();
-        }
-
-        static bool Init { get; set; }
-
-        static MessageModel[] MockMessages;
-
-        static string[] MockContents = new[]
-        {
-            "Hi, How are you?",
-            "I'm fine thanks",
-            "How was your day? Is it right\nI know that you are very tired",
-            "Keep going !!! You are the best you know ❤️",
-            "My name is Trung",
-            "ABCD\nXYZY"
-        };
     }
 }

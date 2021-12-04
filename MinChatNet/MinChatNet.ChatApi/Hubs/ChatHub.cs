@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using MinChatNet.ChatApi.Clients;
 using MinChatNet.ChatApi.Models;
 using MinChatNet.ChatApi.Persistence;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using ISession = Cassandra.ISession;
 
 namespace MinChatNet.ChatApi.Hubs
@@ -23,14 +25,7 @@ namespace MinChatNet.ChatApi.Hubs
 
         public async Task SendMessage(SendMessageModel messageModel)
         {
-            var user = await _dataContext.Users
-                .Where(o => o.Id == Context.UserIdentifier)
-                .Select(o => new UserModel
-                {
-                    Avatar = o.Avatar,
-                    DisplayName = o.DisplayName,
-                    UserId = o.Id
-                }).FirstOrDefaultAsync();
+            var user = await GetUserModelAsync();
 
             var mapper = new Mapper(_cassSession);
 
@@ -39,17 +34,46 @@ namespace MinChatNet.ChatApi.Hubs
                 Content = messageModel.Content,
                 Time = DateTimeOffset.UtcNow,
                 UserId = user.UserId,
+                UserDisplayName = user.DisplayName,
                 RoomId = "public"
             };
 
-            await mapper.InsertAsync(message);
+            await mapper.InsertAsync(message, insertNulls: true, ttl: 60);
 
             await Clients.All.ReceiveMessage(new MessageModel
             {
                 Content = message.Content,
                 FromUser = user,
+                UserDisplayName = user.DisplayName,
                 Time = message.Time
             });
+        }
+
+        private async Task<UserModel> GetUserModelAsync()
+        {
+            var isGuest = Context.User.FindFirstValue(ClaimTypes.Anonymous) == $"{true}";
+            if (isGuest)
+            {
+                var userModel = new UserModel
+                {
+                    DisplayName = Context.User.FindFirstValue(JwtRegisteredClaimNames.GivenName),
+                    IsGuest = true,
+                    UserId = Context.UserIdentifier
+                };
+                return userModel;
+            }
+            else
+            {
+                return await _dataContext.Users
+                    .Where(o => o.Id == Context.UserIdentifier)
+                    .Select(o => new UserModel
+                    {
+                        Avatar = o.Avatar,
+                        DisplayName = o.DisplayName,
+                        IsGuest = false,
+                        UserId = o.Id
+                    }).FirstOrDefaultAsync();
+            }
         }
     }
 }

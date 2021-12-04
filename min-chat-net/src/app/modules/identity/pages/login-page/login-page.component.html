@@ -7,4 +7,23 @@
             <div id="firebaseui-auth-container"></div>
         </div>
     </div>
+    <div nz-row class="guest-login__container" nzJustify="center" nzAlign="middle">
+        <div nz-col class="login__container">
+            <p><b>Or login as a guest</b></p>
+            <form nz-form [nzLayout]="'inline'" [formGroup]="guestLoginForm" (ngSubmit)="onLoginAsGuest()">
+                <nz-form-item>
+                    <nz-form-control nzErrorTip="Please input your display name!">
+                        <nz-input-group nzPrefixIcon="user">
+                            <input formControlName="displayName" nz-input placeholder="Display name" />
+                        </nz-input-group>
+                    </nz-form-control>
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-control>
+                        <button nz-button nzType="primary" [disabled]="!guestLoginForm.valid">Log in</button>
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        </div>
+    </div>
 </div>

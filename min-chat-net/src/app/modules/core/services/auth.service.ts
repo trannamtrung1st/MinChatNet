@@ -36,6 +36,17 @@ export class AuthService {
     });
   }
 
+  loginAsGuest(displayName: string) {
+    const url = new URL('/api/auth/guest/token', environment.apiUrl);
+    this._httpClient.post<TokenResponseModel>(url.toString(), { displayName })
+      .subscribe((tokenResponse) => {
+        sessionStorage.setItem('accessToken', tokenResponse.accessToken);
+        sessionStorage.setItem('localUser', JSON.stringify(tokenResponse.user));
+        this.login(tokenResponse.user);
+      });
+  }
+
+
   login(user: UserModel) {
     this._globalStateService.setCurrentUser(user);
     this._router.navigateByUrl('/');

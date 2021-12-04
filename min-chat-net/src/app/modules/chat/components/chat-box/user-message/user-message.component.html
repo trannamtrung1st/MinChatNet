@@ -5,7 +5,7 @@
         </div>
         <div nz-col nzSpan="16" class="message__body-container">
             <span class="message__display-name" *ngIf="!message.isSameUser">
-                {{message.fromUser.displayName}}
+                {{message.userDisplayName}}
             </span>
             <nz-card>
                 <div class="message__body line-wrap" [nzTooltipTitle]="message.time | date: TIME_FORMAT"

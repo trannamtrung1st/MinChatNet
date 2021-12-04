@@ -1,9 +1,7 @@
 @import "variables";
 
-.login {
-    &__row {
-        height: 100vh;
-    }
+.login,
+.guest-login {
     &__title {
         background-color: $color-primary;
         padding: $common-space;
@@ -15,6 +13,11 @@
     }
     &__container {
         text-align: center;
+    }
+}
+
+.login {
+    &__container {
         #firebaseui-auth-container {
             display: inline-block;
         }

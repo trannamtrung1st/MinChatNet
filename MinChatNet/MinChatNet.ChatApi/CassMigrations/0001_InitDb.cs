@@ -14,6 +14,7 @@ namespace MinChatNet.ChatApi.CassMigrations
                 "(Id uuid, " +
                 "Content text," +
                 "UserId varchar," +
+                "UserDisplayName varchar," +
                 "RoomId varchar," +
                 "Time timestamp," +
                 "PRIMARY KEY (RoomId,Time,Id))"));
