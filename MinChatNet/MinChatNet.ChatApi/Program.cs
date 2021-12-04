@@ -1,11 +1,15 @@
+using Cassandra;
+using Cassandra.Mapping;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MinChatNet.ChatApi;
+using MinChatNet.ChatApi.CassMigrations;
 using MinChatNet.ChatApi.Hubs;
 using MinChatNet.ChatApi.Persistence;
+using MinChatNet.ChatApi.Persistence.CassMappings;
 using MinChatNet.ChatApi.Services;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -15,6 +19,20 @@ configuration.Bind(nameof(AppSettings), AppSettings.Instance);
 
 // Add services to the container.
 var services = builder.Services;
+
+services.AddScoped<Cluster>(services =>
+{
+    return Cluster.Builder()
+        .WithConnectionString(configuration.GetConnectionString(nameof(MessageContext)))
+        .Build();
+});
+
+services.AddScoped<ICluster>(services => services.GetRequiredService<Cluster>());
+
+services.AddScoped<Cassandra.ISession>(services => services.GetRequiredService<ICluster>()
+        .Connect());
+
+services.AddScoped<Migrator>();
 
 services.AddDbContext<DataContext>(opt =>
     opt.UseNpgsql(configuration.GetConnectionString(nameof(DataContext))));
@@ -93,6 +111,11 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
     await dbContext.Database.MigrateAsync();
+
+    var cassMigrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+    await cassMigrator.MigrateAsync();
+
+    MappingConfiguration.Global.Define<GlobalMapping>();
 }
 
 app.Run();

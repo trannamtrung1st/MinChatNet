@@ -76,12 +76,14 @@ export class MessageInputComponent implements OnInit, OnChanges {
     const currentSelectionStart = this._messageElement.nativeElement.selectionStart;
     const currentContent: string = this.messageControl.value;
     const searchContent = currentContent.substring(0, currentSelectionStart);
+    const lastBreakIdx = searchContent.lastIndexOf('\n');
     const lastSpaceIdx = searchContent.lastIndexOf(' ');
-    const lastWord = searchContent.substring(lastSpaceIdx).trim();
+    const startFromIdx = lastSpaceIdx > lastBreakIdx ? lastSpaceIdx : lastBreakIdx;
+    const lastWord = searchContent.substring(startFromIdx).trim();
     if (lastWord) {
       const emoji = EMOJI_MAP.map[lastWord];
       if (emoji) {
-        const wordStart = lastSpaceIdx + 1;
+        const wordStart = startFromIdx + 1;
         const wordEnd = wordStart + lastWord.length;
         this._messageElement.nativeElement.setSelectionRange(wordStart, wordEnd);
         this._insert(emoji + ' ');
@@ -93,11 +95,13 @@ export class MessageInputComponent implements OnInit, OnChanges {
 
   private _checkAndReplaceAllEmojis() {
     const currentContent: string = this.messageControl.value;
-    const finalContent = currentContent.split(' ')
-      .map(word => {
-        const emoji = EMOJI_MAP.map[word];
-        return emoji || word;
-      }).join(' ');
+    const finalContent = currentContent.split('\n').map(line => {
+      return line.split(' ')
+        .map(word => {
+          const emoji = EMOJI_MAP.map[word];
+          return emoji || word;
+        }).join(' ');
+    }).join('\n');
     this.messageControl.setValue(finalContent);
   }
 

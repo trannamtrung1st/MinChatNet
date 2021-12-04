@@ -1,0 +1,9 @@
+docker container rm -f mcn-cass-1.0
+
+docker image prune -f
+docker image rm -f trannamtrung1st/min-chat-net:mcn-cass-1.0
+docker image build . -t trannamtrung1st/min-chat-net:mcn-cass-1.0
+docker image push trannamtrung1st/min-chat-net:mcn-cass-1.0
+
+
+docker container run -d --name mcn-cass-1.0 -p 9042:9042 trannamtrung1st/min-chat-net:mcn-cass-1.0

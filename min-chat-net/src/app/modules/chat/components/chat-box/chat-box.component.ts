@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { map, tap } from 'rxjs';
 
 import { environment } from '@environments/environment';
 
@@ -42,6 +43,12 @@ export class ChatBoxComponent implements OnInit {
         this.oldest = response.isOldest;
         this._appendHistory(response.messages);
         this._connectHub();
+
+        if (!this.oldest
+          && this.chatViewElement.nativeElement.scrollHeight <= this.chatViewElement.nativeElement.clientHeight) {
+          this.loading = true;
+          this._loadMoreMessages();
+        }
       });
   }
 
@@ -56,12 +63,7 @@ export class ChatBoxComponent implements OnInit {
     const isScrollToTop = Math.abs(chatView.scrollTop - topScroll) < loadingMargin;
     if (isScrollToTop && !this.oldest && !this.loading) {
       this.loading = true;
-      const currentOldest = this.chatContent[this.chatContent.length - 1];
-      this._getHistory(new Date(currentOldest.time)).subscribe(response => {
-        this.oldest = response.isOldest;
-        this._appendHistory(response.messages);
-        this.loading = false;
-      });
+      this._loadMoreMessages();
     }
   }
 
@@ -70,6 +72,7 @@ export class ChatBoxComponent implements OnInit {
       content
     }
     this.hubConnection.invoke('SendMessage', messageModel).catch((err) => console.error(err));
+    this.chatViewElement.nativeElement.scrollTop = 0;
   }
 
   private _receiveMessage(messageModel: MessageModel) {
@@ -92,6 +95,17 @@ export class ChatBoxComponent implements OnInit {
       params: {
         previous: previous.toISOString()
       }
+    }).pipe(
+      tap(response => response.messages.reverse())
+    );
+  }
+
+  private _loadMoreMessages() {
+    const currentOldest = this.chatContent[this.chatContent.length - 1];
+    this._getHistory(new Date(currentOldest.time)).subscribe(response => {
+      this.oldest = response.isOldest;
+      this._appendHistory(response.messages);
+      this.loading = false;
     });
   }
 

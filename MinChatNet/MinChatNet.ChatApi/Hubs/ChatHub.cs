@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Cassandra.Mapping;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MinChatNet.ChatApi.Clients;
 using MinChatNet.ChatApi.Models;
 using MinChatNet.ChatApi.Persistence;
+using ISession = Cassandra.ISession;
 
 namespace MinChatNet.ChatApi.Hubs
 {
@@ -11,9 +13,12 @@ namespace MinChatNet.ChatApi.Hubs
     public class ChatHub : Hub<IChatClient>
     {
         private readonly DataContext _dataContext;
-        public ChatHub(DataContext dataContext)
+        private readonly ISession _cassSession;
+        public ChatHub(DataContext dataContext,
+            ISession cassSession)
         {
             _dataContext = dataContext;
+            _cassSession = cassSession;
         }
 
         public async Task SendMessage(SendMessageModel messageModel)
@@ -27,11 +32,23 @@ namespace MinChatNet.ChatApi.Hubs
                     UserId = o.Id
                 }).FirstOrDefaultAsync();
 
-            await Clients.All.ReceiveMessage(new MessageModel
+            var mapper = new Mapper(_cassSession);
+
+            var message = new Message
             {
                 Content = messageModel.Content,
+                Time = DateTimeOffset.UtcNow,
+                UserId = user.UserId,
+                RoomId = "public"
+            };
+
+            await mapper.InsertAsync(message);
+
+            await Clients.All.ReceiveMessage(new MessageModel
+            {
+                Content = message.Content,
                 FromUser = user,
-                Time = DateTimeOffset.UtcNow
+                Time = message.Time
             });
         }
     }

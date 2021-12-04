@@ -19,6 +19,11 @@ services:
       - 5432:5432
     environment:
       POSTGRES_PASSWORD: 123456
+      
+  cass1:
+    image: trannamtrung1st/min-chat-net:mcn-cass-1.0
+    ports:
+      - 9042:9042
 
 networks:
   default:

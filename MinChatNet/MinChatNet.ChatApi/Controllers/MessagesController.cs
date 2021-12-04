@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Cassandra.Data.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinChatNet.ChatApi.Models;
 using MinChatNet.ChatApi.Persistence;
+using ISession = Cassandra.ISession;
 
 namespace MinChatNet.ChatApi.Controllers
 {
@@ -10,36 +12,55 @@ namespace MinChatNet.ChatApi.Controllers
     public class MessageController : ControllerBase
     {
         private readonly DataContext _dataContext;
-        public MessageController(DataContext dataContext)
+        private readonly ISession _cassSession;
+        public MessageController(DataContext dataContext,
+            ISession cassSession)
         {
             _dataContext = dataContext;
+            _cassSession = cassSession;
         }
 
         [HttpGet("history")]
         public async Task<IActionResult> GetMessageHistory([FromQuery] DateTimeOffset previous)
         {
-            const int DefaultTake = 10;
+            const int DefaultTake = 17;
 
             await Task.Delay(1000);
 
-            await InitMockMessages();
+            var messTbl = new Table<MessageMV>(_cassSession);
 
-            var messages = MockMessages.Where(o => o.Time < previous)
+            var messages = (await messTbl.Where(o => o.RoomId == "public" && o.Time < previous)
                 .Take(DefaultTake)
-                .OrderBy(o => o.Time)
+                .OrderByDescending(o => o.Time)
+                .AllowFiltering()
+                .ExecuteAsync())
                 .ToArray();
+            var messageUsers = messages.Select(o => o.UserId).Distinct().ToArray();
+            var users = await _dataContext.Users.Where(u => messageUsers.Contains(u.Id))
+                .Select(o => new UserModel
+                {
+                    Avatar = o.Avatar,
+                    DisplayName = o.DisplayName,
+                    UserId = o.Id
+                }).ToDictionaryAsync(o => o.UserId);
 
             var isOldest = messages.Length < DefaultTake;
 
+            var messageModels = messages.Select(o => new MessageModel
+            {
+                Content = o.Content,
+                Time = o.Time,
+                FromUser = users.TryGetValue(o.UserId, out var fromUser) ? fromUser : null
+            }).ToArray();
+
             var messageHistoryModel = new MessageHistoryResponseModel
             {
-                Messages = messages,
+                Messages = messageModels,
                 IsOldest = isOldest
             };
 
             return Ok(messageHistoryModel);
         }
-
 
         private async Task InitMockMessages()
         {
