@@ -22,6 +22,7 @@ import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { PublicChatComponent } from './pages/public-chat/public-chat.component';
 import { MessageInputComponent } from './components/chat-box/message-input/message-input.component';
 import { UserMessageComponent } from './components/chat-box/user-message/user-message.component';
+import { PrivateChatComponent } from './pages/private-chat/private-chat.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { UserMessageComponent } from './components/chat-box/user-message/user-me
     PublicChatComponent,
     ChatBoxComponent,
     MessageInputComponent,
-    UserMessageComponent
+    UserMessageComponent,
+    PrivateChatComponent
   ],
   imports: [
     CommonModule,

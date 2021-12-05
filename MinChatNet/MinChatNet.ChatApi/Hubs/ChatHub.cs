@@ -1,4 +1,5 @@
-﻿using Cassandra.Mapping;
+﻿using Cassandra.Data.Linq;
+using Cassandra.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -23,29 +24,61 @@ namespace MinChatNet.ChatApi.Hubs
             _cassSession = cassSession;
         }
 
+        public override async Task OnConnectedAsync()
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, Room.PublicRoomId);
+        }
+
         public async Task SendMessage(SendMessageModel messageModel)
         {
             var user = await GetUserModelAsync();
 
             var mapper = new Mapper(_cassSession);
 
+            if (messageModel.RoomId != Room.PublicRoomId)
+            {
+                var publicRoom = await mapper.FirstOrDefaultAsync<Room>("WHERE Id = ?", messageModel.RoomId);
+                if (publicRoom?.Members?.Contains(user.UserId) == false)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+            }
+
             var message = new Message
             {
                 Content = messageModel.Content,
                 UserId = user.UserId,
                 UserDisplayName = user.DisplayName,
-                RoomId = "public"
+                RoomId = messageModel.RoomId
             };
 
             await mapper.InsertAsync(message, insertNulls: true, ttl: 3600);
 
-            await Clients.All.ReceiveMessage(new MessageModel
+            await Clients.Group(message.RoomId).ReceiveMessage(new MessageModel
             {
                 Content = message.Content,
                 FromUser = user,
                 UserDisplayName = user.DisplayName,
+                RoomId = message.RoomId,
                 Time = message.Time
             });
+        }
+
+        public async Task JoinPrivateRoom(string roomId)
+        {
+            var mapper = new Mapper(_cassSession);
+
+            if (roomId == Room.PublicRoomId)
+            {
+                return;
+            }
+
+            await mapper.UpdateAsync<Room>("SET Members = Members + ? WHERE Id = ?", new HashSet<string>
+            {
+                Context.UserIdentifier
+            }, roomId);
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         }
 
         private async Task<UserModel> GetUserModelAsync()

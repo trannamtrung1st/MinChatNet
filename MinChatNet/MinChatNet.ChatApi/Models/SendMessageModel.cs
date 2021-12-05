@@ -3,5 +3,6 @@
     public class SendMessageModel
     {
         public string Content { get; set; }
+        public string RoomId { get; set; }
     }
 }

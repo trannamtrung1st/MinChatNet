@@ -5,4 +5,5 @@ export interface MessageModel {
     userDisplayName: string;
     fromUser: UserModel;
     time: string;
+    roomId: string;
 }

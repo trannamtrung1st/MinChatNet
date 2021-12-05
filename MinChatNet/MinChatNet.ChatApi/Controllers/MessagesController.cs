@@ -23,20 +23,30 @@ namespace MinChatNet.ChatApi.Controllers
         }
 
         [HttpGet("history")]
-        public async Task<IActionResult> GetMessageHistory([FromQuery] DateTimeOffset previous)
+        public async Task<IActionResult> GetMessageHistory([FromQuery] MessageHistoryQuery query)
         {
             const int DefaultTake = 17;
 
             await Task.Delay(1000);
 
+            if (query.RoomId != Room.PublicRoomId)
+            {
+                var roomTbl = new Table<Room>(_cassSession);
+                var publicRoom = (await roomTbl.Where(r => r.Id == query.RoomId).ExecuteAsync()).FirstOrDefault();
+                if (publicRoom?.Members?.Contains(User.Identity.Name) == false)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+            }
+
             var messTbl = new Table<MessageMV>(_cassSession);
 
             // [Important] can only use EQ (==) or IN (Contains) for partition keys,
             // other filters must be used with AllowFiltering
-            var (month, year) = (previous.Month, previous.Year);
+            var (month, year) = (query.Previous.Month, query.Previous.Year);
             var messages = (await messTbl
-                .Where(o => o.RoomId == "public" && o.Month == month && o.Year == year)
-                .Where(o => o.Time < previous)
+                .Where(o => o.RoomId == query.RoomId && o.Month == month && o.Year == year)
+                .Where(o => o.Time < query.Previous)
                 .Take(DefaultTake)
                 .AllowFiltering()
                 .ExecuteAsync())
@@ -74,5 +84,11 @@ namespace MinChatNet.ChatApi.Controllers
 
             return Ok(messageHistoryModel);
         }
+    }
+
+    public class MessageHistoryQuery
+    {
+        public string RoomId { get; set; }
+        public DateTimeOffset Previous { get; set; }
     }
 }

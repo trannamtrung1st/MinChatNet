@@ -1,6 +1,20 @@
 <nz-layout class="layout">
     <nz-header>
-        <div nz-row nzJustify="end">
+        <div nz-row nzJustify="space-between">
+            <div nz-col>
+                <ng-container *ngIf="isInPrivate;else isInPublic">
+                    <button (click)="onLeavePrivateRoom()" nz-button nzType="dashed" [nzDanger]="true">
+                        <span>Leave</span>
+                        <i nz-icon nzType="close" nzTheme="outline"></i>
+                    </button>
+                </ng-container>
+                <ng-template #isInPublic>
+                    <button (click)="onNewPrivateRoom()" nz-button nzType="dashed">
+                        <span>New private room</span>
+                        <i nz-icon nzType="plus" nzTheme="outline"></i>
+                    </button>
+                </ng-template>
+            </div>
             <div nz-col>
                 <div class="user-menu" *ngIf="currentUser">
                     <div nz-row nzGutter="16" nzAlign="middle">

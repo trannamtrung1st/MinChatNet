@@ -1,3 +1,4 @@
 export interface SendMessageModel {
-    content: string
+    content: string,
+    roomId: string
 }

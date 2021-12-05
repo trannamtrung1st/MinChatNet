@@ -1,3 +1,4 @@
-<div class="chat-box-container" *ngIf="currentUser">
-    <app-chat-box [currentUser]="currentUser"></app-chat-box>
+<div class="chat-box-container" *ngIf="pageVisible">
+    <app-chat-box *ngIf="currentUser && roomId && hubConnection" [hubConnection]="hubConnection" [roomId]="roomId"
+        [currentUser]="currentUser"></app-chat-box>
 </div>

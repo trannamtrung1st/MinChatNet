@@ -1,0 +1,5 @@
+<div class="chat-box-container" *ngIf="pageVisible">
+    <p>Invite your friends with link: <a [href]="joinLink">{{joinLink}}</a></p>
+    <app-chat-box *ngIf="currentUser && roomId && hubConnection" [roomId]="roomId" [currentUser]="currentUser"
+        [hubConnection]="hubConnection"></app-chat-box>
+</div>

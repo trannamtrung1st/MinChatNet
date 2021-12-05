@@ -27,12 +27,14 @@ namespace MinChatNet.ChatApi.Controllers
             return Ok(new PublicDataModel
             {
                 TotalLogin = totalLogin,
+                PublicRoomId = Room.PublicRoomId
             });
         }
     }
 
     public class PublicDataModel
     {
+        public string PublicRoomId { get; set; }
         public long TotalLogin { get; set; }
     }
 }

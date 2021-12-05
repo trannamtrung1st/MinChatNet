@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import * as firebase from "firebase/app";
+
+import { environment } from '@environments/environment';
+
+import { PublicDataModel } from '@modules/core/models/public-data.model';
 
 import { GlobalStateService } from '@modules/core/services/global-state.service';
 
@@ -12,7 +17,8 @@ import { GlobalStateService } from '@modules/core/services/global-state.service'
 })
 export class AppComponent implements OnInit {
 
-  constructor(private _globalStateService: GlobalStateService) { }
+  constructor(private _globalStateService: GlobalStateService,
+    private _httpClient: HttpClient) { }
 
   async ngOnInit() {
     const firebaseConfig: firebase.FirebaseOptions = {
@@ -27,5 +33,14 @@ export class AppComponent implements OnInit {
     const app = firebase.initializeApp(firebaseConfig);
 
     this._globalStateService.loadLocalUser();
+
+    this._getPublicData();
+  }
+
+  private _getPublicData() {
+    const url = new URL('/api/public', environment.apiUrl);
+    return this._httpClient.get<PublicDataModel>(url.toString()).subscribe((data) => {
+      this._globalStateService.setPublicData(data);
+    });
   }
 }

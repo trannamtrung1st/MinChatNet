@@ -6,6 +6,8 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 import { NormalLayoutComponent } from './components/normal-layout/normal-layout.component';
 
@@ -20,7 +22,9 @@ import { NormalLayoutComponent } from './components/normal-layout/normal-layout.
     NzLayoutModule,
     NzAvatarModule,
     NzGridModule,
-    NzDropDownModule
+    NzDropDownModule,
+    NzButtonModule,
+    NzIconModule
   ],
   exports: [
     NormalLayoutComponent

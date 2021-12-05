@@ -1,8 +1,8 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { map, tap } from 'rxjs';
+import { map, Subscription, tap } from 'rxjs';
 
 import { environment } from '@environments/environment';
 
@@ -12,29 +12,40 @@ import { MessageViewModel } from '@modules/chat/view-models/message-view.model';
 import { MessageHistoryResponseModel } from '@modules/chat/models/message-history-response.model';
 import { SendMessageModel } from '@modules/chat/models/send-message.model';
 
+import { GlobalStateService } from '@modules/core/services/global-state.service';
+import { MessageHistoryQueryModel } from '@modules/chat/models/message-history-query.model';
+
 
 @Component({
   selector: 'app-chat-box',
   templateUrl: './chat-box.component.html',
   styleUrls: ['./chat-box.component.scss']
 })
-export class ChatBoxComponent implements OnInit {
+export class ChatBoxComponent implements OnInit, OnDestroy {
 
   @ViewChild('chatView', { static: true }) chatViewElement!: ElementRef<HTMLDivElement>;
 
   @Input() currentUser!: UserModel;
+  @Input() roomId: string;
+  @Input() hubConnection!: HubConnection;
 
-  hubConnection!: HubConnection;
-  connected: boolean;
   chatContent: MessageViewModel[];
   oldest: boolean;
   loading: boolean;
 
-  constructor(private _httpClient: HttpClient) {
-    this.connected = false;
+  private readonly _subscriptions: Subscription[];
+
+  constructor(private _httpClient: HttpClient,
+    private _globalStateService: GlobalStateService) {
     this.chatContent = [];
     this.oldest = true;
     this.loading = false;
+    this._subscriptions = [];
+    this.roomId = '';
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   ngOnInit(): void {
@@ -42,7 +53,7 @@ export class ChatBoxComponent implements OnInit {
       .subscribe((response) => {
         this.oldest = response.isOldest;
         this._appendHistory(response.messages);
-        this._connectHub();
+        this._handleHubMethods();
 
         if (!this.oldest
           && this.chatViewElement.nativeElement.scrollHeight <= this.chatViewElement.nativeElement.clientHeight) {
@@ -69,13 +80,15 @@ export class ChatBoxComponent implements OnInit {
 
   private _sendMessage(content: string) {
     const messageModel: SendMessageModel = {
-      content
+      content,
+      roomId: this.roomId
     }
     this.hubConnection.invoke('SendMessage', messageModel).catch((err) => console.error(err));
     this.chatViewElement.nativeElement.scrollTop = 0;
   }
 
   private _receiveMessage(messageModel: MessageModel) {
+    if (messageModel.roomId !== this.roomId) return;
     const isSameUser = this.chatContent.length ? this.chatContent[0].fromUser.userId === messageModel.fromUser.userId : false;
     this.chatContent.unshift(this._convertToViewModel(messageModel, isSameUser));
   }
@@ -91,10 +104,12 @@ export class ChatBoxComponent implements OnInit {
 
   private _getHistory(previous: Date) {
     const url = new URL('/api/messages/history', environment.apiUrl);
+    const params: MessageHistoryQueryModel = {
+      previous: previous.toISOString(),
+      roomId: this.roomId
+    };
     return this._httpClient.get<MessageHistoryResponseModel>(url.toString(), {
-      params: {
-        previous: previous.toISOString()
-      }
+      params: params as any
     }).pipe(
       tap(response => response.messages)
     );
@@ -127,19 +142,8 @@ export class ChatBoxComponent implements OnInit {
     this.chatContent.push(...messageViewModels);
   }
 
-  private _connectHub() {
-    const hubUrl = new URL("/hub/chat", environment.apiUrl);
-    this.hubConnection = new HubConnectionBuilder()
-      .withUrl(hubUrl.toString(), { accessTokenFactory: () => sessionStorage.getItem('accessToken') as string })
-      .build();
-
+  private _handleHubMethods() {
     this.hubConnection.on("ReceiveMessage", (messageModel: MessageModel) =>
       this._receiveMessage(messageModel));
-
-    this.hubConnection.start()
-      .then(() => {
-        this.connected = true;
-      })
-      .catch((err) => console.error(err));
   }
 }
