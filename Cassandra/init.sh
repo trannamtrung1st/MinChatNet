@@ -15,7 +15,7 @@ while cqlsh -e 'help' 2>&1 >/dev/null | grep ConnectionRefusedError ; do
 done
 
 echo Prepare to run CQL
-sleep 5
+sleep 15
 
 cqlsh -u cassandra -p cassandra -f /create-user.cql
 
