@@ -33,7 +33,6 @@ namespace MinChatNet.ChatApi.Controllers
 
             var messages = (await messTbl.Where(o => o.RoomId == "public" && o.Time < previous)
                 .Take(DefaultTake)
-                .OrderByDescending(o => o.Time)
                 .AllowFiltering()
                 .ExecuteAsync())
                 .ToArray();

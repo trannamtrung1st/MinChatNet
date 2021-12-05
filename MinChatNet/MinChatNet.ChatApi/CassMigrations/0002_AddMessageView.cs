@@ -10,10 +10,16 @@ namespace MinChatNet.ChatApi.CassMigrations
 
         public async Task UpgradeAsync(ISession session)
         {
+            // [Important] Clustering order must specify all clustering keys
             await session.ExecuteAsync(new SimpleStatement($"CREATE MATERIALIZED VIEW {nameof(MessageMV)} AS " +
                 $"SELECT * FROM Message " +
-                $"WHERE RoomId IS NOT NULL AND Id IS NOT NULL AND Time IS NOT NULL " +
-                $"PRIMARY KEY(RoomId,Time,Id)"));
+                $"WHERE RoomId IS NOT NULL " +
+                $"AND Month IS NOT NULL " +
+                $"AND Year IS NOT NULL " +
+                $"AND UserId IS NOT NULL " +
+                $"AND Time IS NOT NULL " +
+                $"PRIMARY KEY((Month,Year,RoomId),Time,UserId) " +
+                $"WITH CLUSTERING ORDER BY (Time DESC, UserId ASC)"));
         }
 
         public async Task RevertAsync(ISession session)

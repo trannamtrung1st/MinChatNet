@@ -32,13 +32,12 @@ namespace MinChatNet.ChatApi.Hubs
             var message = new Message
             {
                 Content = messageModel.Content,
-                Time = DateTimeOffset.UtcNow,
                 UserId = user.UserId,
                 UserDisplayName = user.DisplayName,
                 RoomId = "public"
             };
 
-            await mapper.InsertAsync(message, insertNulls: true, ttl: 60);
+            await mapper.InsertAsync(message, insertNulls: true, ttl: 3600);
 
             await Clients.All.ReceiveMessage(new MessageModel
             {

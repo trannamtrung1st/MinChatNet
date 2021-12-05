@@ -1,4 +1,6 @@
-﻿using FirebaseAdmin.Auth;
+﻿using Cassandra;
+using Cassandra.Mapping;
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,7 @@ using MinChatNet.ChatApi.Persistence;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ISession = Cassandra.ISession;
 
 namespace MinChatNet.ChatApi.Controllers
 {
@@ -16,9 +19,12 @@ namespace MinChatNet.ChatApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly DataContext _dataContext;
-        public AuthController(DataContext dataContext)
+        private readonly ISession _cassSession;
+        public AuthController(DataContext dataContext,
+            ISession cassSession)
         {
             _dataContext = dataContext;
+            _cassSession = cassSession;
         }
 
         [HttpPost("token")]
@@ -52,6 +58,8 @@ namespace MinChatNet.ChatApi.Controllers
             };
             var accessToken = GenerateTokenResponse(userModel);
 
+            await SaveLoginTracking(userModel);
+
             return Ok(new TokenResponse
             {
                 User = userModel,
@@ -70,10 +78,27 @@ namespace MinChatNet.ChatApi.Controllers
             };
             var accessToken = GenerateTokenResponse(userModel);
 
+            await SaveLoginTracking(userModel);
+
             return Ok(new TokenResponse
             {
                 User = userModel,
                 AccessToken = accessToken
+            });
+        }
+
+        private async Task SaveLoginTracking(UserModel userModel)
+        {
+            var mapper = new Mapper(_cassSession);
+            var now = DateTimeOffset.UtcNow;
+            await mapper.InsertAsync(new LoginTracking
+            {
+                IsGuest = userModel.IsGuest,
+                Month = now.Month,
+                Year = now.Year,
+                Time = TimeUuid.NewId(),
+                UserDisplayName = userModel.DisplayName,
+                UserId = userModel.UserId
             });
         }
 

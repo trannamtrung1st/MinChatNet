@@ -15,9 +15,10 @@
     ::ng-deep {
         .message-input {
             textarea {
-                $adjusted-top: 7px;
+                $adjusted-padding: 7px;
 
-                padding-top: $adjusted-top;
+                padding-top: $adjusted-padding;
+                padding-bottom: $adjusted-padding;
                 border-radius: $common-border-radius;
                 min-height: $large-size;
                 resize: none;

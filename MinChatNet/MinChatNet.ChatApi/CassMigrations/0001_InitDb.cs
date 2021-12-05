@@ -10,14 +10,18 @@ namespace MinChatNet.ChatApi.CassMigrations
 
         public async Task UpgradeAsync(ISession session)
         {
+            // [Important] maximum 2 billion cells (rows x columns), must fit on a single node
             await session.ExecuteAsync(new SimpleStatement($"CREATE TABLE {nameof(Message)} \n" +
-                "(Id uuid, " +
+                "(" +
+                "Month int," +
+                "Year int," +
+                "RoomId varchar," +
                 "Content text," +
                 "UserId varchar," +
                 "UserDisplayName varchar," +
-                "RoomId varchar," +
                 "Time timestamp," +
-                "PRIMARY KEY (RoomId,Time,Id))"));
+                "PRIMARY KEY ((Month,Year,RoomId),Time,UserId)" +
+                ") WITH CLUSTERING ORDER BY (Time DESC)"));
         }
 
         public async Task RevertAsync(ISession session)

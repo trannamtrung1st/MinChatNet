@@ -96,7 +96,7 @@ export class ChatBoxComponent implements OnInit {
         previous: previous.toISOString()
       }
     }).pipe(
-      tap(response => response.messages.reverse())
+      tap(response => response.messages)
     );
   }
 
@@ -114,17 +114,17 @@ export class ChatBoxComponent implements OnInit {
     const chatLength = this.chatContent.length;
     let oldestMessage = chatLength > 0 ? this.chatContent[chatLength - 1] : undefined;
     if (oldestMessage) {
-      const isSameUser = oldestMessage.fromUser.userId === messages[messages.length - 1].fromUser.userId;
+      const isSameUser = oldestMessage.fromUser.userId === messages[0].fromUser.userId;
       oldestMessage.isSameUser = isSameUser;
     }
     const messageViewModels = messages.map((message, idx, arr) => {
       let isSameUser = false;
-      if (idx > 0) {
-        isSameUser = message.fromUser.userId === arr[idx - 1].fromUser.userId;
+      if (idx < arr.length - 1) {
+        isSameUser = message.fromUser.userId === arr[idx + 1].fromUser.userId;
       }
       return this._convertToViewModel(message, isSameUser);
     });
-    this.chatContent.push(...messageViewModels.reverse());
+    this.chatContent.push(...messageViewModels);
   }
 
   private _connectHub() {
