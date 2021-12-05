@@ -22,10 +22,17 @@ namespace MinChatNet.ChatApi.CassMigrations
                 "Time timestamp," +
                 "PRIMARY KEY ((Month,Year,RoomId),Time,UserId)" +
                 ") WITH CLUSTERING ORDER BY (Time DESC)"));
+
+            // [Important] Index can be used to query collections
+            await session.ExecuteAsync(new SimpleStatement("CREATE INDEX MYear ON Message (year);"));
+            await session.ExecuteAsync(new SimpleStatement("CREATE INDEX MMonth ON Message (month);"));
         }
 
         public async Task RevertAsync(ISession session)
         {
+            await session.ExecuteAsync(new SimpleStatement("DROP INDEX MYear"));
+            await session.ExecuteAsync(new SimpleStatement("DROP INDEX MMonth"));
+
             await session.ExecuteAsync(new SimpleStatement($"DROP TABLE {nameof(Message)}"));
         }
     }

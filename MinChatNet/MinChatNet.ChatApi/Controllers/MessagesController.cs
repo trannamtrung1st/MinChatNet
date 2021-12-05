@@ -31,7 +31,12 @@ namespace MinChatNet.ChatApi.Controllers
 
             var messTbl = new Table<MessageMV>(_cassSession);
 
-            var messages = (await messTbl.Where(o => o.RoomId == "public" && o.Time < previous)
+            // [Important] can only use EQ (==) or IN (Contains) for partition keys,
+            // other filters must be used with AllowFiltering
+            var (month, year) = (previous.Month, previous.Year);
+            var messages = (await messTbl
+                .Where(o => o.RoomId == "public" && o.Month == month && o.Year == year)
+                .Where(o => o.Time < previous)
                 .Take(DefaultTake)
                 .AllowFiltering()
                 .ExecuteAsync())

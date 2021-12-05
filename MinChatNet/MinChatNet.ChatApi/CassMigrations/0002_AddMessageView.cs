@@ -20,6 +20,8 @@ namespace MinChatNet.ChatApi.CassMigrations
                 $"AND Time IS NOT NULL " +
                 $"PRIMARY KEY((Month,Year,RoomId),Time,UserId) " +
                 $"WITH CLUSTERING ORDER BY (Time DESC, UserId ASC)"));
+
+            // [Important] can only order by clustered columns
         }
 
         public async Task RevertAsync(ISession session)
